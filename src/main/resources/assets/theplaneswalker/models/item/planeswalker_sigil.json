@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "theplaneswalker:items/planeswalker_sigil"
+    "layer0": "theplaneswalker:item/planeswalker_sigil"
   }
 }
