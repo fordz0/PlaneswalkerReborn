@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -23,7 +23,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -55,7 +54,7 @@ public abstract class AbstractBlockStateMixin {
 
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     private void preventCollisionWhenPhasing(World world, BlockPos pos, Entity entity, CallbackInfo ci) {
-        for (PlayerEntity plr : entity.world.getPlayers()) {
+        for (PlayerEntity plr : entity.getWorld().getPlayers()) {
             ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 ci.cancel();
@@ -77,9 +76,9 @@ public abstract class AbstractBlockStateMixin {
         }
     }
 
-    @Inject(method = "hasSolidTopSurface(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Direction;)Z", at = @At("HEAD"), cancellable = true)
-    private void noSolidTop(BlockView world, BlockPos pos, Entity entity, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        for (PlayerEntity plr : entity.world.getPlayers()) {
+    @Inject(method = "hasSolidTopSurface(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
+    private void noSolidTop(BlockView world, BlockPos pos, Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        for (PlayerEntity plr : entity.getWorld().getPlayers()) {
             ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 cir.setReturnValue(false);

@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -19,23 +19,23 @@ package net.scirave.theplaneswalker.helpers;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 
 public class TeleportHelper {
 
     public static boolean viableNonCollide(BlockState state) {
-        return state.getMaterial() == Material.WATER || (!state.getMaterial().isLiquid() && !state.getMaterial().blocksMovement());
+        return state.getFluidState().isIn(FluidTags.WATER) || (state.getFluidState().isEmpty() && !state.blocksMovement());
     }
 
     public static boolean viableNonCollideNoWater(BlockState state) {
-        return !state.getMaterial().isLiquid() && !state.getMaterial().blocksMovement();
+        return state.getFluidState().isEmpty() && !state.blocksMovement();
     }
 
     public static boolean viableCollide(BlockState state) {
-        return state.getMaterial() == Material.WATER || state.isIn(BlockTags.VALID_SPAWN) || state.getMaterial().blocksMovement();
+        return state.getFluidState().isIn(FluidTags.WATER) || state.isIn(BlockTags.VALID_SPAWN) || state.blocksMovement();
     }
 
     public static Integer platformUp(ServerWorld world, int x, int y, int z) {

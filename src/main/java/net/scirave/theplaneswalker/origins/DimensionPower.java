@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -25,8 +25,8 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
 
 public class DimensionPower extends Power {
@@ -37,14 +37,14 @@ public class DimensionPower extends Power {
 
     public DimensionPower(PowerType<?> type, LivingEntity entity, RegistryKey<World> key) {
         super(type, entity);
-        if (entity == null || entity.world.isClient) {
+        if (entity == null || entity.getWorld().isClient) {
             return;
         }
-        MinecraftServer server = entity.world.getServer();
+        MinecraftServer server = entity.getWorld().getServer();
         if (server != null) {
             worldFocus = server.getWorld(key);
         }
-        updateWorld((ServerWorld) entity.world);
+        updateWorld((ServerWorld) entity.getWorld());
     }
 
     public void updateWorld(ServerWorld world) {
@@ -60,9 +60,9 @@ public class DimensionPower extends Power {
 
     @Override
     public void fromTag(NbtElement tag) {
-        RegistryKey<World> key = RegistryKey.of(Registry.WORLD_KEY, new Identifier(tag.asString()));
+        RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, new Identifier(tag.asString()));
         if (key != null) {
-            MinecraftServer server = entity.world.getServer();
+            MinecraftServer server = entity.getWorld().getServer();
             if (server != null) {
                 updateWorld(server.getWorld(key));
             }

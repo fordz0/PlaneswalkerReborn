@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -18,7 +18,7 @@
 package net.scirave.theplaneswalker.mixin;
 
 import io.github.apace100.apoli.component.PowerHolderComponent;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.scirave.theplaneswalker.origins.OnTeleportPower;
@@ -36,8 +36,8 @@ public class ServerPlayerNetworkHandlerMixin {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;Z)V", at = @At("HEAD"))
-    public void teleporting(double x, double y, double z, float yaw, float pitch, Set<PlayerPositionLookS2CPacket.Flag> flags, boolean shouldDismount, CallbackInfo ci) {
+    @Inject(method = "requestTeleport(DDDFFLjava/util/Set;)V", at = @At("HEAD"))
+    public void teleporting(double x, double y, double z, float yaw, float pitch, Set<PositionFlag> flags, CallbackInfo ci) {
         PowerHolderComponent.getPowers(this.player, OnTeleportPower.class).forEach(OnTeleportPower::onTeleport);
     }
 

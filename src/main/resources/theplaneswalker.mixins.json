@@ -2,11 +2,10 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.scirave.theplaneswalker.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractBlockMixin",
     "AbstractBlockStateMixin",
-    "AdmireItemTaskMixin",
     "AnvilScreenHandlerMixin",
     "EnchantingTableBlockMixin",
     "EnchantmentScreenHandlerMixin",
@@ -14,18 +13,14 @@
     "ExperienceBottleEntityMixin",
     "ExperienceOrbEntityMixin",
     "GlassBottleItemMixin",
-    "GolemEntityMixin",
     "LivingEntityMixin",
-    "MilkBucketItemMixin",
     "PersistentProjectileEntityMixin",
-    "PiglinBrainMixin",
     "PlayerEntityMixin",
     "PlayerEntityMixin2",
     "ProjectileEntityMixin",
     "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
-    "ServerPlayerNetworkHandlerMixin",
-    "VillagerEntityMixin"
+    "ServerPlayerNetworkHandlerMixin"
   ],
   "client": [
     "CameraMixin",

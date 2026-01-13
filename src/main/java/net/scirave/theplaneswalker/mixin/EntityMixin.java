@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -67,12 +67,10 @@ public abstract class EntityMixin {
 
     @Inject(method = "isInvisible", at = @At("HEAD"), cancellable = true)
     public void invisible(CallbackInfoReturnable<Boolean> cir) {
-        //Overridden
     }
 
     @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
     public void invisibleTo(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        //Overridden
     }
 
 }

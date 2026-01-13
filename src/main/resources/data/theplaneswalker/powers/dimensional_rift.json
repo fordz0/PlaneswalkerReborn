@@ -104,28 +104,6 @@
         {
           "condition": {
             "type": "origins:resource",
-            "resource": "theplaneswalker:positional_anchor_onoff",
-            "comparison": "==",
-            "compare_to": 1
-          },
-          "action": {
-            "type": "origins:and",
-            "actions": [
-              {
-                "type": "origins:change_resource",
-                "resource": "theplaneswalker:positional_anchor_onoff",
-                "change": -1
-              },
-              {
-                "type": "origins:trigger_cooldown",
-                "power": "theplaneswalker:positional_anchor_cooldown"
-              }
-            ]
-          }
-        },
-        {
-          "condition": {
-            "type": "origins:resource",
             "resource": "theplaneswalker:dimensional_rift_choose",
             "comparison": "==",
             "compare_to": 1

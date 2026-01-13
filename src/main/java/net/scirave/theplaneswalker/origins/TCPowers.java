@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -27,8 +27,8 @@ import io.github.apace100.calio.data.SerializableDataTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.scirave.theplaneswalker.ThePlaneswalker;
 
@@ -49,9 +49,9 @@ public class TCPowers {
 
     public static final PowerType<?> INSOMNIAC = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "insomniac"));
 
-    public static final PowerType<?> CORRUPTED_BLOOD = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "corrupted_blood"));
+    public static final PowerType<?> VOID_VEINS = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "void_veins"));
 
-    public static final PowerType<?> TARNISHED_REPUTATION = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "tarnished_reputation"));
+    public static final PowerType<?> EMPTY_RESERVES = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "empty_reserves"));
 
     private static void register(PowerFactory<?> serializer) {
         Registry.register(ApoliRegistries.POWER_FACTORY, serializer.getSerializerId(), serializer);

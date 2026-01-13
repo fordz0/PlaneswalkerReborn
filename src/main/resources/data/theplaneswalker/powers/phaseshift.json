@@ -11,8 +11,8 @@
   "bar": {
     "type": "origins:resource",
     "min": 0,
-    "start_value": 80,
-    "max": 80,
+    "start_value": 120,
+    "max": 120,
     "hud_render": {
       "should_render": true,
       "sprite_location": "theplaneswalker:textures/gui/resource_bar.png",
@@ -21,7 +21,7 @@
         "type": "origins:resource",
         "resource": "theplaneswalker:phaseshift_bar",
         "comparison": "<",
-        "compare_to": 80
+        "compare_to": 120
       }
     },
     "min_action": {
