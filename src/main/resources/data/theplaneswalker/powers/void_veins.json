@@ -1,0 +1,5 @@
+{
+  "type": "origins:simple",
+  "name": "Void Veins",
+  "description": "Healing is 50% weaker in the Overworld, but normal in the Void."
+}

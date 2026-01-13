@@ -1,5 +1,13 @@
 {
+  "carvers": {
+    "air": []
+  },
+  "downfall": 0.4,
   "effects": {
+    "ambient_sound": "minecraft:ambient.basalt_deltas.loop",
+    "fog_color": 0,
+    "foliage_color": 5877296,
+    "grass_color": 7979098,
     "mood_sound": {
       "sound": "minecraft:ambient.basalt_deltas.mood",
       "tick_delay": 6000,
@@ -7,20 +15,14 @@
       "offset": 2
     },
     "sky_color": 0,
-    "fog_color": 0,
     "water_color": 4159204,
-    "water_fog_color": 329011,
-    "foliage_color": 5877296,
-    "grass_color": 7979098,
-    "ambient_sound": "minecraft:ambient.basalt_deltas.loop"
+    "water_fog_color": 329011
   },
-  "carvers": {
-    "air": []
-  },
-  "starts": [],
   "features": [
     []
   ],
+  "has_precipitation": false,
+  "spawn_costs": {},
   "spawners": {
     "ambient": [],
     "creature": [],
@@ -29,14 +31,6 @@
     "water_ambient": [],
     "water_creature": []
   },
-  "category": "none",
-  "precipitation": "none",
-  "surface_builder": "minecraft:stone",
-  "scale": 0.05,
-  "downfall": 0.4,
-  "depth": 0.12,
-  "temperature": 0.8,
-  "player_spawn_friendly": false,
-  "spawn_costs": {},
-  "creature_spawn_probability": 0
+  "starts": [],
+  "temperature": 0.8
 }

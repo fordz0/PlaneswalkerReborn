@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -41,10 +41,10 @@ public class AbstractBlockMixin {
 
     @Inject(at = @At("RETURN"), method = "getOutlineShape", cancellable = true)
     private void modifyBlockOutline(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (context instanceof EntityShapeContext) {
-            if (((EntityShapeContext) context).getEntity().isPresent()) {
-                Entity entity = ((EntityShapeContext) context).getEntity().get();
-                for (PlayerEntity plr : entity.world.getPlayers()) {
+        if (context instanceof EntityShapeContext entityContext) {
+            Entity entity = entityContext.getEntity();
+            if (entity != null) {
+                for (PlayerEntity plr : entity.getWorld().getPlayers()) {
                     ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
                     if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                         cir.setReturnValue(VoxelShapes.empty());

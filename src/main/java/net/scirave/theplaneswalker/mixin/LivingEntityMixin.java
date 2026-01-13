@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -21,11 +21,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 import net.scirave.theplaneswalker.helpers.ServerPlayerEntityInterface;
 import net.scirave.theplaneswalker.origins.TCPowers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -42,7 +44,15 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Inject(method = "isFallFlying", at = @At("HEAD"), cancellable = true)
     public void noGliding(CallbackInfoReturnable<Boolean> cir) {
-        //Overridden
+    }
+
+    @ModifyVariable(method = "heal", at = @At("HEAD"), index = 1)
+    private float reduceHealingInOverworld(float amount) {
+        if (TCPowers.VOID_VEINS.isActive((LivingEntity) (Object) this)
+                && ((LivingEntity) (Object) this).getWorld().getRegistryKey().equals(World.OVERWORLD)) {
+            return amount * 0.5F;
+        }
+        return amount;
     }
 
     @Inject(method = "canSee", at = @At("HEAD"), cancellable = true)
@@ -54,12 +64,10 @@ public abstract class LivingEntityMixin extends EntityMixin {
 
     @Inject(method = "pushAway", at = @At("HEAD"), cancellable = true)
     public void stopPushingAway(Entity entity, CallbackInfo ci) {
-        //Overridden
     }
 
     @Inject(method = "pushAwayFrom", at = @At("HEAD"), cancellable = true)
     public void stopPushingAwayFrom(Entity entity, CallbackInfo ci) {
-        //Overridden
     }
 
 

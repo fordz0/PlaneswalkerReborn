@@ -5,7 +5,7 @@
     "actions": [
       {
         "type": "origins:feed",
-        "food": -20,
+        "food": -16,
         "saturation": 0
       },
       {

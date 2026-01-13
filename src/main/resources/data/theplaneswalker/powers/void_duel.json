@@ -1,0 +1,93 @@
+{
+  "type": "origins:multiple",
+  "onoff": {
+    "type": "origins:resource",
+    "min": 0,
+    "max": 1,
+    "hud_render": {
+      "should_render": false
+    }
+  },
+  "cooldown": {
+    "type": "origins:cooldown",
+    "cooldown": 80,
+    "hud_render": {
+      "sprite_location": "theplaneswalker:textures/gui/resource_bar.png",
+      "bar_index": 1,
+      "should_render": true
+    }
+  },
+  "use": {
+    "type": "origins:active_self",
+    "key": {
+      "key": "key.origins.secondary_active"
+    },
+    "cooldown": 0,
+    "hud_render": {
+      "should_render": false
+    },
+    "entity_action": {
+      "type": "origins:if_else_list",
+      "actions": [
+        {
+          "condition": {
+            "type": "origins:resource",
+            "resource": "theplaneswalker:void_duel_onoff",
+            "comparison": "==",
+            "compare_to": 1
+          },
+          "action": {
+            "type": "origins:change_resource",
+            "resource": "theplaneswalker:void_duel_onoff",
+            "change": -1
+          }
+        },
+        {
+          "condition": {
+            "type": "origins:resource",
+            "resource": "theplaneswalker:void_duel_cooldown",
+            "comparison": "==",
+            "compare_to": 0
+          },
+          "action": {
+            "type": "origins:change_resource",
+            "resource": "theplaneswalker:void_duel_onoff",
+            "change": 1
+          }
+        }
+      ]
+    },
+    "condition": {
+      "type": "origins:sneaking"
+    }
+  },
+  "onhit": {
+    "type": "origins:self_action_on_hit",
+    "cooldown": 0,
+    "entity_action": {
+      "type": "origins:and",
+      "actions": [
+        {
+          "type": "theplaneswalker:void_duel"
+        },
+        {
+          "type": "origins:change_resource",
+          "resource": "theplaneswalker:void_duel_onoff",
+          "change": -1
+        },
+        {
+          "type": "origins:trigger_cooldown",
+          "power": "theplaneswalker:void_duel_cooldown"
+        }
+      ]
+    },
+    "condition": {
+      "type": "origins:resource",
+      "resource": "theplaneswalker:void_duel_onoff",
+      "comparison": "==",
+      "compare_to": 1
+    }
+  },
+  "name": "Void Duel",
+  "description": "(4s CD) Secondary key while sneaking. Your next punch drags both you and the target into the Void for 10 seconds, then returns you."
+}

@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -44,7 +44,7 @@ public abstract class ExperienceBottleEntityMixin extends ThrownEntity {
     public void redirectSpawn(HitResult hitResult, CallbackInfo ci) {
         if (this.getOwner() instanceof ServerPlayerEntity player) {
             if (TCPowers.SOULFOOD.isActive(player)) {
-                ExperienceOrbEntity.spawn((ServerWorld) this.world, this.getPos(), 6);
+                ExperienceOrbEntity.spawn((ServerWorld) this.getWorld(), this.getPos(), 6);
                 this.discard();
                 ci.cancel();
             }

@@ -1,6 +1,6 @@
 /*
  * The Planeswalker
- * Copyright (c) 2021 SciRave
+ * Copyright (c) 2026 SciRave
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -33,9 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = ExperienceOrbEntity.class, priority = 100)
 public abstract class ExperienceOrbEntityMixin extends Entity {
 
-
-    private boolean notFed = true;
-
     public ExperienceOrbEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
@@ -45,16 +42,14 @@ public abstract class ExperienceOrbEntityMixin extends Entity {
 
     @Inject(method = "onPlayerCollision", at = @At("HEAD"), cancellable = true)
     public void repairCheck(PlayerEntity player, CallbackInfo ci) {
-        if (!player.world.isClient()) {
+        if (!player.getWorld().isClient()) {
             if (TCPowers.SOULFOOD.isActive(player)) {
                 HungerManager hungerManager = player.getHungerManager();
                 if (hungerManager.getFoodLevel() < 20) {
+                    hungerManager.add(getExperienceAmount(), 0.6F);
                     ci.cancel();
                     this.discard();
-                }
-                if (notFed) {
-                    hungerManager.add(getExperienceAmount(), 0.6F);
-                    notFed = false;
+                    return;
                 }
             }
         }

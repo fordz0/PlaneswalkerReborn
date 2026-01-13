@@ -92,6 +92,34 @@
       "compare_to": 0
     }
   },
+  "reset_fall": {
+    "type": "origins:action_over_time",
+    "interval": 1,
+    "condition": {
+      "type": "theplaneswalker:is_flying"
+    },
+    "entity_action": {
+      "type": "origins:set_fall_distance",
+      "fall_distance": 0
+    }
+  },
+  "speed_burst": {
+    "type": "origins:action_over_time",
+    "interval": 1,
+    "condition": {
+      "type": "theplaneswalker:is_flying"
+    },
+    "entity_action": {
+      "type": "origins:apply_effect",
+      "effect": {
+        "effect": "minecraft:speed",
+        "amplifier": 1,
+        "duration": 40,
+        "show_particles": false,
+        "show_icon": true
+      }
+    }
+  },
   "name": "Spatial Stride",
-  "description": "(4s CD) User can have creative flight for 0.35 seconds. Fall distance is not reset."
+  "description": "(4s CD) Brief hover flight (~0.35s) with Speed II. Fall distance is reset while active."
 }
