@@ -1,6 +1,6 @@
 /*
- * The Planeswalker
- * Copyright (c) 2026 SciRave
+ * Origins: Planeswalker Reborn
+ * Copyright (c) 2026 SciRave, fordz0
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
