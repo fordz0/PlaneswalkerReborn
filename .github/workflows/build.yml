@@ -32,9 +32,20 @@ jobs:
         run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
+      - name: resolve artifact name
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        id: vars
+        run: |
+          version=$(grep -E '^mod_version=' gradle.properties | cut -d'=' -f2)
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+      - name: prepare mod jar
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        run: |
+          jar=$(ls build/libs/*.jar | grep -vE '(sources|dev|javadoc)\.jar$' | head -n 1)
+          cp "${jar}" "build/libs/Origins-Planeswalker-Reborn-${{ steps.vars.outputs.version }}.jar"
       - name: capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from latest java on one OS
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
-          path: build/libs/
+          path: build/libs/Origins-Planeswalker-Reborn-${{ steps.vars.outputs.version }}.jar
