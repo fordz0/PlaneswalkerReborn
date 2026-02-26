@@ -2,6 +2,8 @@
 
 A race of space-time manipulators who escaped the Void, reborn with new powers and a home dimension built for traversal and duels.
 
+This fork intentionally changes some behavior from the original mod; this document is the source of truth for current workings.
+
 ## Core Abilities
 - **Planewalk**: Main key while sneaking. Place/remove a tether that sends you to the Void when you move a set distance away, and returns you safely when possible.
 - **Phaseshift**: Main key while not sneaking. Become intangible to entities (and vice-versa) while a resource bar drains and recharges.
@@ -27,4 +29,4 @@ A race of space-time manipulators who escaped the Void, reborn with new powers a
 
 ## Credit
 - Original mod by SciRave: https://www.curseforge.com/minecraft/mc-mods/origins-the-planeswalker
-- This is an unofficial 1.20.1 port/fork; all credit to the original author.
+- This is an unofficial 1.20.2 port/fork; all credit to the original author.
