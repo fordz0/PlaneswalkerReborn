@@ -14,8 +14,8 @@ jobs:
         java: [
             17    # Minimum supported by Minecraft
         ]
-        # and run on both Linux and Windowse
-        os: [ ubuntu-20.04, windows-latest ]
+        # and run on Linux
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repository
@@ -28,13 +28,23 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: temurin
       - name: make gradle wrapper executable
-        if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
+      - name: resolve artifact name
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        id: vars
+        run: |
+          version=$(grep -E '^mod_version=' gradle.properties | cut -d'=' -f2)
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+      - name: prepare mod jar
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        run: |
+          jar=$(ls build/libs/*.jar | grep -vE '(sources|dev|javadoc)\.jar$' | head -n 1)
+          cp "${jar}" "build/libs/Origins-Planeswalker-Reborn-${{ steps.vars.outputs.version }}.jar"
       - name: capture build artifacts
         if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from latest java on one OS
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
-          path: build/libs/
+          path: build/libs/Origins-Planeswalker-Reborn-${{ steps.vars.outputs.version }}.jar
