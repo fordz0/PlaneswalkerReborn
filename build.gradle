@@ -12,7 +12,7 @@ targetCompatibility = JavaVersion.VERSION_17
 group = rootProject.maven_group
 
 base {
-    archivesName = rootProject.name + ' - ' + rootProject.mod_version
+    archivesName = "${rootProject.name}-mc${project.minecraft_version}"
 }
 
 
