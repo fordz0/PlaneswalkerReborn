@@ -24,3 +24,7 @@ A race of space-time manipulators who escaped the Void, reborn with new powers a
 ## Notes
 - Void has 100x coordinate scaling for long-distance travel.
 - Phaseshift drains faster while sprinting or using items.
+
+## Credit
+- Original mod by SciRave: https://www.curseforge.com/minecraft/mc-mods/origins-the-planeswalker
+- This is an unofficial 1.20.1 port/fork; all credit to the original author.
