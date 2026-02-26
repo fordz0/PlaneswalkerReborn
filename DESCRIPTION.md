@@ -26,7 +26,12 @@ This fork intentionally changes some behavior from the original mod; this docume
 ## Notes
 - Void has 100x coordinate scaling for long-distance travel.
 - Phaseshift drains faster while sprinting or using items.
+- Phaseshift visual effect was updated for the 1.21.1 shader pipeline.
+
+## Version
+- Target Minecraft version: **1.21.1**
+- Target Origins version: **1.13.0-pre.1**
 
 ## Credit
 - Original mod by SciRave: https://www.curseforge.com/minecraft/mc-mods/origins-the-planeswalker
-- This is an unofficial 1.20.2 port/fork; all credit to the original author.
+- This is an unofficial 1.21.1 pre-release port/fork; all credit to the original author.
