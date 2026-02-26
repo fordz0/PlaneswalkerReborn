@@ -54,6 +54,10 @@ public final class VoidDuelTracker {
         PENDING_RETURNS.put(entity.getUuid(), entry);
     }
 
+    public static boolean isInDuel(Entity entity) {
+        return entity != null && PENDING_RETURNS.containsKey(entity.getUuid());
+    }
+
     public static void tick(MinecraftServer server) {
         Iterator<Map.Entry<UUID, ReturnEntry>> iterator = PENDING_RETURNS.entrySet().iterator();
         while (iterator.hasNext()) {

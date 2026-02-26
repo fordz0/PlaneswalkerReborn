@@ -51,6 +51,9 @@ public abstract class ExperienceOrbEntityMixin extends Entity {
                     this.discard();
                     return;
                 }
+                float saturationBonus = getExperienceAmount() * 1.2F;
+                float newSaturation = Math.min(20.0F, hungerManager.getSaturationLevel() + saturationBonus);
+                hungerManager.setSaturationLevel(newSaturation);
             }
         }
     }

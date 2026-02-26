@@ -172,8 +172,9 @@ public class TCEntityActions {
                     if (lastAttacked == null || lastAttacked == player || player.getServer() == null) {
                         return;
                     }
-                    VoidDuelTracker.scheduleReturn(player);
-                    VoidDuelTracker.scheduleReturn(lastAttacked);
+                    if (VoidDuelTracker.isInDuel(player) || VoidDuelTracker.isInDuel(lastAttacked)) {
+                        return;
+                    }
                     RegistryKey<World> voidKey = RegistryKey.of(RegistryKeys.WORLD, new Identifier(ThePlaneswalker.MODID, "void"));
                     ServerWorld voidWorld = player.getServer().getWorld(voidKey);
                     if (voidWorld == null) {
@@ -187,6 +188,8 @@ public class TCEntityActions {
                     double x = targetPos.getX() + 0.5;
                     double y = safeY;
                     double z = targetPos.getZ() + 0.5;
+                    VoidDuelTracker.scheduleReturn(player);
+                    VoidDuelTracker.scheduleReturn(lastAttacked);
                     teleportEntity(voidWorld, player, x, y, z);
                     teleportEntity(voidWorld, lastAttacked, x, y, z);
                 }));

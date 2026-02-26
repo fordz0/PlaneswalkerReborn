@@ -10,7 +10,7 @@
   },
   "cooldown": {
     "type": "origins:cooldown",
-    "cooldown": 80,
+    "cooldown": 600,
     "hud_render": {
       "sprite_location": "theplaneswalker:textures/gui/resource_bar.png",
       "bar_index": 1,
@@ -89,5 +89,5 @@
     }
   },
   "name": "Void Duel",
-  "description": "(4s CD) Secondary key while sneaking. Your next punch drags both you and the target into the Void for 10 seconds, then returns you."
+  "description": "(30s CD) Secondary key while sneaking. Your next punch drags both you and the target into the Void for 10 seconds, then returns you."
 }
