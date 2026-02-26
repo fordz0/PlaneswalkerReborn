@@ -1,71 +1,108 @@
 {
   "targets": [
-    "one",
-    "two",
-    "three",
-    "swap",
-    "previous",
-    "next"
+    "temp",
+    "swap"
   ],
   "passes": [
     {
-      "name": "phosphor",
+      "name": "box_blur",
       "intarget": "minecraft:main",
-      "outtarget": "one",
-      "auxtargets": [
-        {
-          "name": "PrevSampler",
-          "id": "previous"
-        }
-      ],
+      "outtarget": "temp",
+      "use_linear_filter": true,
       "uniforms": [
         {
-          "name": "Phosphor",
+          "name": "BlurDir",
           "values": [
-            0.85,
-            0.85,
-            0.85
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "name": "Radius",
+          "values": [
+            3.0
           ]
         }
       ]
     },
     {
-      "name": "antialias",
-      "intarget": "one",
-      "outtarget": "two"
-    },
-    {
-      "name": "deconverge",
-      "intarget": "two",
-      "outtarget": "three"
-    },
-    {
-      "name": "fxaa",
-      "intarget": "three",
-      "outtarget": "swap"
-    },
-    {
-      "name": "blit",
-      "intarget": "swap",
-      "outtarget": "previous"
+      "name": "box_blur",
+      "intarget": "temp",
+      "outtarget": "swap",
+      "use_linear_filter": true,
+      "uniforms": [
+        {
+          "name": "BlurDir",
+          "values": [
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "name": "Radius",
+          "values": [
+            3.0
+          ]
+        }
+      ]
     },
     {
       "name": "color_convolve",
       "intarget": "swap",
-      "outtarget": "next",
+      "outtarget": "temp",
       "uniforms": [
         {
           "name": "Saturation",
           "values": [
-            0
+            0.08
           ]
         }
       ]
     },
     {
       "name": "blit",
-      "intarget": "next",
-      "outtarget": "minecraft:main"
+      "intarget": "temp",
+      "outtarget": "swap",
+      "uniforms": [
+        {
+          "name": "ColorModulate",
+          "values": [
+            0.65,
+            0.82,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invert",
+      "intarget": "swap",
+      "outtarget": "temp",
+      "uniforms": [
+        {
+          "name": "InverseAmount",
+          "values": [
+            0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blit",
+      "intarget": "temp",
+      "outtarget": "minecraft:main",
+      "uniforms": [
+        {
+          "name": "ColorModulate",
+          "values": [
+            0.88,
+            0.93,
+            1.05,
+            1.0
+          ]
+        }
+      ]
     }
   ]
 }
