@@ -17,12 +17,16 @@
 
 package net.scirave.theplaneswalker.origins;
 
+import io.github.apace100.apoli.action.ActionConfiguration;
+import io.github.apace100.apoli.action.context.EntityActionContext;
+import io.github.apace100.apoli.action.type.EntityActionType;
 import io.github.apace100.apoli.component.PowerHolderComponent;
 import io.github.apace100.apoli.data.ApoliDataTypes;
-import io.github.apace100.apoli.power.PowerType;
-import io.github.apace100.apoli.power.VariableIntPower;
-import io.github.apace100.apoli.power.factory.action.ActionFactory;
+import io.github.apace100.apoli.data.TypedDataObjectFactory;
+import io.github.apace100.apoli.power.PowerReference;
+import io.github.apace100.apoli.power.type.VariableIntPowerType;
 import io.github.apace100.apoli.registry.ApoliRegistries;
+import io.github.apace100.calio.data.SerializableData.Instance;
 import io.github.apace100.calio.data.SerializableData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -40,22 +44,36 @@ import net.scirave.theplaneswalker.helpers.TeleportHelper;
 import net.scirave.theplaneswalker.helpers.VoidDuelTracker;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import java.util.EnumSet;
+import java.util.function.BiConsumer;
+import org.jetbrains.annotations.NotNull;
 
 public class TCEntityActions {
 
-    private static void register(ActionFactory<Entity> actionFactory) {
-        Registry.register(ApoliRegistries.ENTITY_ACTION, actionFactory.getSerializerId(), actionFactory);
+    private static ActionConfiguration<PlaneswalkerEntityActionType> register(Identifier id, SerializableData dataSchema, BiConsumer<Instance, Entity> action) {
+        final ActionConfiguration<PlaneswalkerEntityActionType>[] holder = new ActionConfiguration[1];
+        TypedDataObjectFactory<PlaneswalkerEntityActionType> factory = TypedDataObjectFactory.simple(
+                dataSchema,
+                data -> new PlaneswalkerEntityActionType(holder[0], data, action),
+                (actionType, serializableData) -> actionType.data
+        );
+        ActionConfiguration<PlaneswalkerEntityActionType> configuration = ActionConfiguration.of(id, factory);
+        holder[0] = configuration;
+        Registry.register((Registry) ApoliRegistries.ENTITY_ACTION_TYPE, configuration.id(), configuration);
+        return configuration;
     }
 
-
     public static void initialization() {
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "switch_dimension"), new SerializableData().add("dimension", ApoliDataTypes.POWER_TYPE).add("position", ApoliDataTypes.POWER_TYPE),
+        register(Identifier.of(ThePlaneswalker.MODID, "switch_dimension"), new SerializableData().add("dimension", ApoliDataTypes.POWER_REFERENCE).add("position", ApoliDataTypes.POWER_REFERENCE),
                 (data, entity) -> {
                     if (entity instanceof ServerPlayerEntity player) {
-                        PowerHolderComponent component = PowerHolderComponent.KEY.get(player);
-                        DimensionPower power = (DimensionPower) component.getPower((PowerType<?>) data.get("dimension"));
+                        PowerReference dimensionRef = data.get("dimension");
+                        PowerReference positionRef = data.get("position");
+                        DimensionPower power = TCPowers.getPowerType(player, dimensionRef, DimensionPower.class);
+                        PositionPower position = TCPowers.getPowerType(player, positionRef, PositionPower.class);
+                        if (power == null || position == null) {
+                            return;
+                        }
                         power.updateWorld((ServerWorld) player.getWorld());
-                        PositionPower position = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
                         BlockPos pos = position.pos;
                         power.updateWorld((ServerWorld) player.getWorld());
                         double focusScale = power.worldFocus.getDimension().coordinateScale();
@@ -79,69 +97,71 @@ public class TCEntityActions {
                             }
                         }
                     }
-                }));
+                });
 
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "set_position"), new SerializableData().add("position", ApoliDataTypes.POWER_TYPE),
+        register(Identifier.of(ThePlaneswalker.MODID, "set_position"), new SerializableData().add("position", ApoliDataTypes.POWER_REFERENCE),
                 (data, entity) -> {
-                    PowerHolderComponent component = PowerHolderComponent.KEY.get(entity);
-                    PositionPower power = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
+                    PowerReference positionRef = data.get("position");
+                    PositionPower power = TCPowers.getPowerType(entity, positionRef, PositionPower.class);
                     if (power == null) {
                         return;
                     }
                     power.pos = entity.getBlockPos();
-                    PowerHolderComponent.syncPower(entity, power.getType());
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "sync_resource_position"), new SerializableData().add("position", ApoliDataTypes.POWER_TYPE).add("resource", ApoliDataTypes.POWER_TYPE),
+                    PowerHolderComponent.syncPower(entity, positionRef);
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "sync_resource_position"), new SerializableData().add("position", ApoliDataTypes.POWER_REFERENCE).add("resource", ApoliDataTypes.RESOURCE_REFERENCE),
                 (data, entity) -> {
-                    PowerHolderComponent component = PowerHolderComponent.KEY.get(entity);
-                    PositionPower power = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
+                    PowerReference positionRef = data.get("position");
+                    PowerReference resourceRef = data.get("resource");
+                    PositionPower power = TCPowers.getPowerType(entity, positionRef, PositionPower.class);
                     if (power == null) {
                         return;
                     }
 
                     int distance = (int) Math.sqrt(power.pos.getSquaredDistance(entity.getX(), entity.getY(), entity.getZ()));
 
-                    VariableIntPower resource = (VariableIntPower) component.getPower((PowerType<?>) data.get("resource"));
+                    VariableIntPowerType resource = TCPowers.getPowerType(entity, resourceRef, VariableIntPowerType.class);
                     if (resource == null) {
                         return;
                     }
                     resource.setValue(distance);
 
-                    PowerHolderComponent.syncPower(entity, resource.getType());
+                    PowerHolderComponent.syncPower(entity, resourceRef);
 
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "set_position_block"), new SerializableData().add("position", ApoliDataTypes.POWER_TYPE),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "set_position_block"), new SerializableData().add("position", ApoliDataTypes.POWER_REFERENCE),
                 (data, entity) -> {
                     if (entity instanceof ServerPlayerEntity player) {
-                        PowerHolderComponent component = PowerHolderComponent.KEY.get(entity);
-                        PositionPower power = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
+                        PowerReference positionRef = data.get("position");
+                        PositionPower power = TCPowers.getPowerType(entity, positionRef, PositionPower.class);
                         if (power == null) {
                             return;
                         }
                         power.pos = ((ServerPlayerEntityInterface) player).getLastInteracted();
-                        PowerHolderComponent.syncPower(entity, power.getType());
+                        PowerHolderComponent.syncPower(entity, positionRef);
                     }
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "sync_resource_position_inverse"), new SerializableData().add("position", ApoliDataTypes.POWER_TYPE).add("resource", ApoliDataTypes.POWER_TYPE),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "sync_resource_position_inverse"), new SerializableData().add("position", ApoliDataTypes.POWER_REFERENCE).add("resource", ApoliDataTypes.RESOURCE_REFERENCE),
                 (data, entity) -> {
-                    PowerHolderComponent component = PowerHolderComponent.KEY.get(entity);
-                    PositionPower power = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
+                    PowerReference positionRef = data.get("position");
+                    PowerReference resourceRef = data.get("resource");
+                    PositionPower power = TCPowers.getPowerType(entity, positionRef, PositionPower.class);
                     if (power == null) {
                         return;
                     }
 
                     int distance = (int) Math.sqrt(power.pos.getSquaredDistance(entity.getX(), entity.getY(), entity.getZ()));
 
-                    VariableIntPower resource = (VariableIntPower) component.getPower((PowerType<?>) data.get("resource"));
+                    VariableIntPowerType resource = TCPowers.getPowerType(entity, resourceRef, VariableIntPowerType.class);
                     if (resource == null) {
                         return;
                     }
                     resource.setValue(resource.getMax() - distance);
 
-                    PowerHolderComponent.syncPower(entity, resource.getType());
+                    PowerHolderComponent.syncPower(entity, resourceRef);
 
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "teleport_to_target"), new SerializableData(),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "teleport_to_target"), new SerializableData(),
                 (data, entity) -> {
                     if (entity instanceof ServerPlayerEntity player) {
                         LivingEntity lastAttacked = ((ServerPlayerEntityInterface) player).getLastAttacked();
@@ -151,19 +171,22 @@ public class TCEntityActions {
                             player.onTeleportationDone();
                         }
                     }
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "teleport_target_to_position"), new SerializableData().add("position", ApoliDataTypes.POWER_TYPE),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "teleport_target_to_position"), new SerializableData().add("position", ApoliDataTypes.POWER_REFERENCE),
                 (data, entity) -> {
                     if (entity instanceof ServerPlayerEntity player) {
-                        PowerHolderComponent component = PowerHolderComponent.KEY.get(entity);
-                        PositionPower power = (PositionPower) component.getPower((PowerType<?>) data.get("position"));
+                        PowerReference positionRef = data.get("position");
+                        PositionPower power = TCPowers.getPowerType(entity, positionRef, PositionPower.class);
+                        if (power == null) {
+                            return;
+                        }
                         LivingEntity lastAttacked = ((ServerPlayerEntityInterface) player).getLastAttacked();
                         if (lastAttacked != null) {
                             lastAttacked.requestTeleport(power.pos.getX(), power.pos.getY(), power.pos.getZ());
                         }
                     }
-                }));
-        register(new ActionFactory<>(new Identifier(ThePlaneswalker.MODID, "void_duel"), new SerializableData(),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "void_duel"), new SerializableData(),
                 (data, entity) -> {
                     if (!(entity instanceof ServerPlayerEntity player)) {
                         return;
@@ -175,7 +198,7 @@ public class TCEntityActions {
                     if (VoidDuelTracker.isInDuel(player) || VoidDuelTracker.isInDuel(lastAttacked)) {
                         return;
                     }
-                    RegistryKey<World> voidKey = RegistryKey.of(RegistryKeys.WORLD, new Identifier(ThePlaneswalker.MODID, "void"));
+                    RegistryKey<World> voidKey = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(ThePlaneswalker.MODID, "void"));
                     ServerWorld voidWorld = player.getServer().getWorld(voidKey);
                     if (voidWorld == null) {
                         return;
@@ -192,7 +215,7 @@ public class TCEntityActions {
                     VoidDuelTracker.scheduleReturn(lastAttacked);
                     teleportEntity(voidWorld, player, x, y, z);
                     teleportEntity(voidWorld, lastAttacked, x, y, z);
-                }));
+                });
     }
 
     private static void teleportEntity(ServerWorld world, Entity entity, double x, double y, double z) {
@@ -204,6 +227,28 @@ public class TCEntityActions {
         }
         entity.teleport(world, x, y, z, EnumSet.noneOf(PositionFlag.class), entity.getYaw(), entity.getPitch());
         entity.fallDistance = 0;
+    }
+
+    private static final class PlaneswalkerEntityActionType extends EntityActionType {
+        private final ActionConfiguration<?> configuration;
+        private final Instance data;
+        private final BiConsumer<Instance, Entity> action;
+
+        private PlaneswalkerEntityActionType(ActionConfiguration<?> configuration, Instance data, BiConsumer<Instance, Entity> action) {
+            this.configuration = configuration;
+            this.data = data;
+            this.action = action;
+        }
+
+        @Override
+        public void accept(EntityActionContext context) {
+            action.accept(data, context.entity());
+        }
+
+        @Override
+        public @NotNull ActionConfiguration<?> getConfig() {
+            return configuration;
+        }
     }
 
 }

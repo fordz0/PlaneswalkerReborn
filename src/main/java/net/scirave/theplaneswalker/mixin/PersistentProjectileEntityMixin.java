@@ -37,7 +37,7 @@ public class PersistentProjectileEntityMixin {
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"))
     public BlockState redirectedMethod(World world, BlockPos pos) {
         for (PlayerEntity plr : world.getPlayers()) {
-            ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+            ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 return AIR_STATE;
             }

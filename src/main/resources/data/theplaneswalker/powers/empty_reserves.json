@@ -1,12 +1,19 @@
 {
-  "type": "apoli:status_effect",
-  "status_effect": "minecraft:slowness",
-  "amplifier": 0,
-  "show_particles": false,
-  "show_icon": true,
+  "type": "origins:action_over_time",
+  "interval": 20,
   "condition": {
     "type": "theplaneswalker:has_xp",
     "inverted": true
+  },
+  "entity_action": {
+    "type": "origins:apply_effect",
+    "effect": {
+      "id": "minecraft:slowness",
+      "duration": 40,
+      "amplifier": 0,
+      "show_particles": false,
+      "show_icon": true
+    }
   },
   "name": "Empty Reserves",
   "description": "Without stored experience, you feel sluggish."

@@ -18,15 +18,14 @@
 package net.scirave.theplaneswalker.helpers;
 
 import net.minecraft.entity.player.HungerManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.component.type.FoodComponent;
 
 public class DummyHungerManager extends HungerManager {
 
     public static HungerManager INSTANCE = new DummyHungerManager();
 
     @Override
-    public void eat(Item item, ItemStack stack) {
+    public void eat(FoodComponent foodComponent) {
         //haha no code 4u
     }
 

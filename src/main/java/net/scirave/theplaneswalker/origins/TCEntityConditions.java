@@ -17,30 +17,45 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.factory.condition.ConditionFactory;
+import io.github.apace100.apoli.condition.ConditionConfiguration;
+import io.github.apace100.apoli.condition.context.EntityConditionContext;
+import io.github.apace100.apoli.condition.type.EntityConditionType;
+import io.github.apace100.apoli.data.TypedDataObjectFactory;
 import io.github.apace100.apoli.registry.ApoliRegistries;
+import io.github.apace100.calio.data.SerializableData.Instance;
 import io.github.apace100.calio.data.SerializableData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registry;
 import net.scirave.theplaneswalker.ThePlaneswalker;
+import java.util.function.BiPredicate;
+import org.jetbrains.annotations.NotNull;
 
 public class TCEntityConditions {
 
-    private static void register(ConditionFactory<Entity> conditionFactory) {
-        Registry.register(ApoliRegistries.ENTITY_CONDITION, conditionFactory.getSerializerId(), conditionFactory);
+    private static ConditionConfiguration<PlaneswalkerEntityConditionType> register(Identifier id, SerializableData dataSchema, BiPredicate<Instance, Entity> test) {
+        final ConditionConfiguration<PlaneswalkerEntityConditionType>[] holder = new ConditionConfiguration[1];
+        TypedDataObjectFactory<PlaneswalkerEntityConditionType> factory = TypedDataObjectFactory.simple(
+                dataSchema,
+                data -> new PlaneswalkerEntityConditionType(holder[0], data, test),
+                (conditionType, serializableData) -> conditionType.data
+        );
+        ConditionConfiguration<PlaneswalkerEntityConditionType> configuration = ConditionConfiguration.of(id, factory);
+        holder[0] = configuration;
+        Registry.register((Registry) ApoliRegistries.ENTITY_CONDITION_TYPE, configuration.id(), configuration);
+        return configuration;
     }
 
     public static void initialization() {
-        register(new ConditionFactory<>(new Identifier(ThePlaneswalker.MODID, "is_flying"), new SerializableData(),
+        register(Identifier.of(ThePlaneswalker.MODID, "is_flying"), new SerializableData(),
                 (data, entity) -> {
                     if (entity instanceof PlayerEntity) {
                         return ((PlayerEntity) entity).getAbilities().flying;
                     }
                     return false;
-                }));
-        register(new ConditionFactory<>(new Identifier(ThePlaneswalker.MODID, "exposed_to_sun"), new SerializableData(),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "exposed_to_sun"), new SerializableData(),
                 (data, entity) -> {
                     if (entity == null) {
                         return false;
@@ -51,8 +66,8 @@ public class TCEntityConditions {
                     }
                     var pos = net.minecraft.util.math.BlockPos.ofFloored(entity.getX(), entity.getEyeY(), entity.getZ());
                     return world.isSkyVisible(pos);
-                }));
-        register(new ConditionFactory<>(new Identifier(ThePlaneswalker.MODID, "has_xp"), new SerializableData(),
+                });
+        register(Identifier.of(ThePlaneswalker.MODID, "has_xp"), new SerializableData(),
                 (data, entity) -> {
                     if (!(entity instanceof PlayerEntity player)) {
                         return false;
@@ -68,8 +83,29 @@ public class TCEntityConditions {
                         points += level * level + 6 * level;
                     }
                     return points > 0;
-                }));
+                });
     }
 
+    private static final class PlaneswalkerEntityConditionType extends EntityConditionType {
+        private final ConditionConfiguration<?> configuration;
+        private final Instance data;
+        private final BiPredicate<Instance, Entity> test;
+
+        private PlaneswalkerEntityConditionType(ConditionConfiguration<?> configuration, Instance data, BiPredicate<Instance, Entity> test) {
+            this.configuration = configuration;
+            this.data = data;
+            this.test = test;
+        }
+
+        @Override
+        public boolean test(EntityConditionContext context) {
+            return test.test(data, context.entity());
+        }
+
+        @Override
+        public @NotNull ConditionConfiguration<?> getConfig() {
+            return configuration;
+        }
+    }
 
 }

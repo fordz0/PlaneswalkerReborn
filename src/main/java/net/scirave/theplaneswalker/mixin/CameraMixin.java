@@ -37,7 +37,7 @@ public class CameraMixin {
 
     public FluidState method(World world, BlockPos pos) {
         for (PlayerEntity plr : world.getPlayers()) {
-            ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+            ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 return EMPTY;
             }

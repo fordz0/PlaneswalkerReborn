@@ -46,7 +46,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Se
 
     @Inject(method = "worldChanged", at = @At("HEAD"))
     public void worldChanged(ServerWorld world, CallbackInfo ci) {
-        PowerHolderComponent.getPowers((ServerPlayerEntity) (Object) this, DimensionChangedPower.class).forEach(DimensionChangedPower::onChange);
+        PowerHolderComponent.getPowerTypes((ServerPlayerEntity) (Object) this, DimensionChangedPower.class).forEach(DimensionChangedPower::onChange);
     }
 
     @Inject(method = "sleep", at = @At("HEAD"), cancellable = true)

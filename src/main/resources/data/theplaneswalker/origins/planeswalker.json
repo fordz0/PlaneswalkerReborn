@@ -20,7 +20,7 @@
   ],
   "order": 2,
   "icon": {
-    "item": "theplaneswalker:planeswalker_sigil"
+    "id": "theplaneswalker:planeswalker_sigil"
   },
   "impact": 2
 }

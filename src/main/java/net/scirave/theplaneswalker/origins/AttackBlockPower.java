@@ -17,23 +17,32 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.Power;
-import io.github.apace100.apoli.power.PowerType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import io.github.apace100.apoli.action.EntityAction;
+import io.github.apace100.apoli.condition.EntityCondition;
+import io.github.apace100.apoli.power.PowerConfiguration;
+import io.github.apace100.apoli.power.type.PowerType;
+import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
+public class AttackBlockPower extends PowerType {
 
-public class AttackBlockPower extends Power {
+    private final EntityAction entityAction;
 
-    private final Consumer<Entity> entityAction;
-
-    public AttackBlockPower(PowerType<?> type, LivingEntity entity, Consumer<Entity> entityAction) {
-        super(type, entity);
+    public AttackBlockPower(EntityAction entityAction, Optional<EntityCondition> condition) {
+        super(condition);
         this.entityAction = entityAction;
     }
 
     public void onAttack() {
-        entityAction.accept(this.entity);
+        entityAction.execute(getHolder());
+    }
+
+    public EntityAction getEntityAction() {
+        return entityAction;
+    }
+
+    @Override
+    public @NotNull PowerConfiguration<?> getConfig() {
+        return TCPowers.ATTACK_BLOCK;
     }
 }

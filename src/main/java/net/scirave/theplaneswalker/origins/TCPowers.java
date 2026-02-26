@@ -17,99 +17,110 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.data.ApoliDataTypes;
-import io.github.apace100.apoli.power.PowerType;
-import io.github.apace100.apoli.power.PowerTypeReference;
-import io.github.apace100.apoli.power.factory.PowerFactory;
+import io.github.apace100.apoli.action.EntityAction;
+import io.github.apace100.apoli.power.PowerConfiguration;
+import io.github.apace100.apoli.power.PowerReference;
+import io.github.apace100.apoli.power.type.PowerType;
 import io.github.apace100.apoli.registry.ApoliRegistries;
+import io.github.apace100.calio.data.SerializableData.Instance;
 import io.github.apace100.calio.data.SerializableData;
 import io.github.apace100.calio.data.SerializableDataTypes;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.scirave.theplaneswalker.ThePlaneswalker;
 
-import java.util.function.Consumer;
-
 
 public class TCPowers {
 
-    public static final PowerType<?> FLYING = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "spatial_stride"));
+    public static final PowerReference FLYING = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "spatial_stride"));
 
-    public static final PowerType<?> PHASESHIFT = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "phaseshift_drain"));
+    public static final PowerReference PHASESHIFT = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "phaseshift_drain"));
 
-    public static final PowerType<?> DIMENSIONAL_RIFT = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "dimensional_rift_tether"));
+    public static final PowerReference DIMENSIONAL_RIFT = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "dimensional_rift_tether"));
 
-    public static final PowerType<?> SOULFOOD = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "soulfood"));
+    public static final PowerReference SOULFOOD = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "soulfood"));
 
-    public static final PowerType<?> OVERSPECIALIZATION = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "overspecialization"));
+    public static final PowerReference OVERSPECIALIZATION = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "overspecialization"));
 
-    public static final PowerType<?> INSOMNIAC = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "insomniac"));
+    public static final PowerReference INSOMNIAC = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "insomniac"));
 
-    public static final PowerType<?> VOID_VEINS = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "void_veins"));
+    public static final PowerReference VOID_VEINS = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "void_veins"));
 
-    public static final PowerType<?> EMPTY_RESERVES = new PowerTypeReference<>(new Identifier(ThePlaneswalker.MODID, "empty_reserves"));
+    public static final PowerReference EMPTY_RESERVES = PowerReference.of(Identifier.of(ThePlaneswalker.MODID, "empty_reserves"));
 
-    private static void register(PowerFactory<?> serializer) {
-        Registry.register(ApoliRegistries.POWER_FACTORY, serializer.getSerializerId(), serializer);
+    public static final PowerConfiguration<DimensionPower> DIMENSION = PowerConfiguration.of(
+            Identifier.of(ThePlaneswalker.MODID, "dimension"),
+            PowerType.createConditionedDataFactory(
+                    new SerializableData().add("dimension", SerializableDataTypes.DIMENSION),
+                    (data, condition) -> new DimensionPower((RegistryKey<World>) data.get("dimension"), condition),
+                    (power, serializableData) -> serializableData.instance().set("dimension", power.focusKey)
+            )
+    );
+
+    public static final PowerConfiguration<PositionPower> POSITION = PowerConfiguration.conditionedSimple(
+            Identifier.of(ThePlaneswalker.MODID, "position"),
+            condition -> new PositionPower(BlockPos.ORIGIN, condition)
+    );
+
+    public static final PowerConfiguration<ActivatedPositionPower> ACTIVATED_POSITION = PowerConfiguration.of(
+            Identifier.of(ThePlaneswalker.MODID, "activated_position"),
+            PowerType.createConditionedDataFactory(
+                    new SerializableData().add("range", SerializableDataTypes.INT),
+                    (data, condition) -> new ActivatedPositionPower(BlockPos.ORIGIN, data.getInt("range"), condition),
+                    (power, serializableData) -> serializableData.instance().set("range", power.range)
+            )
+    );
+
+    public static final PowerConfiguration<DimensionChangedPower> DIMENSION_CHANGED = PowerConfiguration.of(
+            Identifier.of(ThePlaneswalker.MODID, "dimension_changed"),
+            PowerType.createConditionedDataFactory(
+                    new SerializableData().add("entity_action", EntityAction.DATA_TYPE),
+                    (data, condition) -> new DimensionChangedPower(data.get("entity_action"), condition),
+                    (power, serializableData) -> serializableData.instance().set("entity_action", power.getEntityAction())
+            )
+    );
+
+    public static final PowerConfiguration<OnTeleportPower> ON_TELEPORT = PowerConfiguration.of(
+            Identifier.of(ThePlaneswalker.MODID, "on_teleport"),
+            PowerType.createConditionedDataFactory(
+                    new SerializableData().add("entity_action", EntityAction.DATA_TYPE),
+                    (data, condition) -> new OnTeleportPower(data.get("entity_action"), condition),
+                    (power, serializableData) -> serializableData.instance().set("entity_action", power.getEntityAction())
+            )
+    );
+
+    public static final PowerConfiguration<AttackBlockPower> ATTACK_BLOCK = PowerConfiguration.of(
+            Identifier.of(ThePlaneswalker.MODID, "attack_block"),
+            PowerType.createConditionedDataFactory(
+                    new SerializableData().add("entity_action", EntityAction.DATA_TYPE),
+                    (data, condition) -> new AttackBlockPower(data.get("entity_action"), condition),
+                    (power, serializableData) -> serializableData.instance().set("entity_action", power.getEntityAction())
+            )
+    );
+
+    private static <T extends PowerType> void register(PowerConfiguration<T> configuration) {
+        Registry.register((Registry) ApoliRegistries.POWER_TYPE, configuration.id(), configuration);
+    }
+
+    public static <T extends PowerType> T getPowerType(Entity entity, PowerReference reference, Class<T> clazz) {
+        PowerType powerType = reference.getNullablePowerType(entity);
+        if (clazz.isInstance(powerType)) {
+            return clazz.cast(powerType);
+        }
+        return null;
     }
 
     public static void initialization() {
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "dimension"),
-
-                        new SerializableData().add("dimension", SerializableDataTypes.DIMENSION),
-
-                        data ->
-                                (type, player) -> new DimensionPower(type, player, (RegistryKey<World>) data.get("dimension"))
-                )
-        );
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "position"), new SerializableData(),
-
-                        data ->
-                                (type, player) -> new PositionPower(type, player, BlockPos.ORIGIN)
-                )
-        );
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "activated_position"), new SerializableData().add("range", SerializableDataTypes.INT),
-
-                        data ->
-                                (type, player) -> new ActivatedPositionPower(type, player, BlockPos.ORIGIN, data.getInt("range"))
-                ).allowCondition()
-        );
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "dimension_changed"),
-
-                        new SerializableData().add("entity_action", ApoliDataTypes.ENTITY_ACTION),
-
-                        data ->
-                                (type, player) -> new DimensionChangedPower(type, player, (Consumer<Entity>) data.get("entity_action"))
-                )
-        );
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "on_teleport"),
-
-                        new SerializableData().add("entity_action", ApoliDataTypes.ENTITY_ACTION),
-
-                        data ->
-                                (type, player) -> new OnTeleportPower(type, player, (Consumer<Entity>) data.get("entity_action"))
-                )
-        );
-
-        register(new PowerFactory<>(new Identifier(ThePlaneswalker.MODID, "attack_block"),
-
-                        new SerializableData().add("entity_action", ApoliDataTypes.ENTITY_ACTION),
-
-                        data ->
-                                (type, player) -> new AttackBlockPower(type, player, (Consumer<Entity>) data.get("entity_action"))
-                ).allowCondition()
-        );
-
-
+        register(DIMENSION);
+        register(POSITION);
+        register(ACTIVATED_POSITION);
+        register(DIMENSION_CHANGED);
+        register(ON_TELEPORT);
+        register(ATTACK_BLOCK);
     }
 
 }

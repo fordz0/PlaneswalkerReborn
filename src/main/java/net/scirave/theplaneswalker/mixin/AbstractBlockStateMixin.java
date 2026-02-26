@@ -43,7 +43,7 @@ public abstract class AbstractBlockStateMixin {
     private void phaseThroughBlocks(BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> info) {
         if (world instanceof World actualWorld) {
             for (PlayerEntity plr : actualWorld.getPlayers()) {
-                ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+                ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
                 if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                     info.setReturnValue(VoxelShapes.empty());
                     return;
@@ -55,7 +55,7 @@ public abstract class AbstractBlockStateMixin {
     @Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
     private void preventCollisionWhenPhasing(World world, BlockPos pos, Entity entity, CallbackInfo ci) {
         for (PlayerEntity plr : entity.getWorld().getPlayers()) {
-            ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+            ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 ci.cancel();
                 return;
@@ -67,7 +67,7 @@ public abstract class AbstractBlockStateMixin {
     private void allowSight(BlockView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (world instanceof World actualWorld) {
             for (PlayerEntity plr : actualWorld.getPlayers()) {
-                ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+                ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
                 if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                     cir.setReturnValue(false);
                     return;
@@ -79,7 +79,7 @@ public abstract class AbstractBlockStateMixin {
     @Inject(method = "hasSolidTopSurface(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
     private void noSolidTop(BlockView world, BlockPos pos, Entity entity, CallbackInfoReturnable<Boolean> cir) {
         for (PlayerEntity plr : entity.getWorld().getPlayers()) {
-            ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+            ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
             if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                 cir.setReturnValue(false);
                 return;
@@ -91,7 +91,7 @@ public abstract class AbstractBlockStateMixin {
     private void noRaycast(BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
         if (world instanceof World actualWorld) {
             for (PlayerEntity plr : actualWorld.getPlayers()) {
-                ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+                ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
                 if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                     cir.setReturnValue(VoxelShapes.empty());
                     return;
@@ -104,7 +104,7 @@ public abstract class AbstractBlockStateMixin {
     public void noReplace(ItemPlacementContext context, CallbackInfoReturnable<Boolean> cir) {
         if (context.getPlayer() != null) {
             for (PlayerEntity plr : context.getWorld().getPlayers()) {
-                ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+                ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
                 if (power != null && power.isActive() && context.getBlockPos().getManhattanDistance(power.pos) <= power.range) {
                     cir.setReturnValue(false);
                     return;

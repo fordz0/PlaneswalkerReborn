@@ -17,9 +17,9 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.Power;
-import io.github.apace100.apoli.power.PowerType;
-import net.minecraft.entity.LivingEntity;
+import io.github.apace100.apoli.condition.EntityCondition;
+import io.github.apace100.apoli.power.PowerConfiguration;
+import io.github.apace100.apoli.power.type.PowerType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.server.MinecraftServer;
@@ -28,45 +28,62 @@ import net.minecraft.util.Identifier;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.world.World;
+import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
-public class DimensionPower extends Power {
+public class DimensionPower extends PowerType {
+
+    public final RegistryKey<World> focusKey;
 
     public ServerWorld worldFocus;
 
     public ServerWorld lastWorld;
 
-    public DimensionPower(PowerType<?> type, LivingEntity entity, RegistryKey<World> key) {
-        super(type, entity);
-        if (entity == null || entity.getWorld().isClient) {
+    public DimensionPower(RegistryKey<World> key, Optional<EntityCondition> condition) {
+        super(condition);
+        this.focusKey = key;
+    }
+
+    @Override
+    public void onInit() {
+        if (getHolder().getWorld().isClient) {
             return;
         }
-        MinecraftServer server = entity.getWorld().getServer();
+        MinecraftServer server = getHolder().getWorld().getServer();
         if (server != null) {
-            worldFocus = server.getWorld(key);
+            worldFocus = server.getWorld(focusKey);
         }
-        updateWorld((ServerWorld) entity.getWorld());
+        updateWorld((ServerWorld) getHolder().getWorld());
     }
 
     public void updateWorld(ServerWorld world) {
-        if (world != worldFocus) {
+        if (world != null && world != worldFocus) {
             lastWorld = world;
         }
     }
 
     @Override
     public NbtElement toTag() {
+        if (lastWorld == null) {
+            return NbtString.of(focusKey.getValue().toString());
+        }
         return NbtString.of(lastWorld.getRegistryKey().getValue().toString());
     }
 
     @Override
     public void fromTag(NbtElement tag) {
-        RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, new Identifier(tag.asString()));
+        RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(tag.asString()));
         if (key != null) {
-            MinecraftServer server = entity.getWorld().getServer();
+            MinecraftServer server = getHolder().getWorld().getServer();
             if (server != null) {
                 updateWorld(server.getWorld(key));
             }
         }
+    }
+
+    @Override
+    public @NotNull PowerConfiguration<?> getConfig() {
+        return TCPowers.DIMENSION;
     }
 
 }

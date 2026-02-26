@@ -22,13 +22,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import net.scirave.theplaneswalker.origins.ActivatedPositionPower;
 import net.scirave.theplaneswalker.origins.TCPowers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +43,7 @@ public class AbstractBlockMixin {
             Entity entity = entityContext.getEntity();
             if (entity != null) {
                 for (PlayerEntity plr : entity.getWorld().getPlayers()) {
-                    ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+                    ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
                     if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
                         cir.setReturnValue(VoxelShapes.empty());
                         return;
@@ -54,18 +52,4 @@ public class AbstractBlockMixin {
             }
         }
     }
-
-    @Inject(method = "canPathfindThrough", at = @At("HEAD"), cancellable = true)
-    private void allowPathfinding(BlockState state, BlockView world, BlockPos pos, NavigationType type, CallbackInfoReturnable<Boolean> cir) {
-        if (world instanceof World actualWorld) {
-            for (PlayerEntity plr : actualWorld.getPlayers()) {
-                ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
-                if (power != null && power.isActive() && pos.getManhattanDistance(power.pos) <= power.range) {
-                    cir.setReturnValue(true);
-                    return;
-                }
-            }
-        }
-    }
-
 }

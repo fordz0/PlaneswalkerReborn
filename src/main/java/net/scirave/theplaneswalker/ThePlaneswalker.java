@@ -36,7 +36,7 @@ public class ThePlaneswalker implements ModInitializer {
 
     public static String MODID = "theplaneswalker";
 
-    public static Identifier ONEIRI_ID = new Identifier(MODID, "oneiri");
+    public static Identifier ONEIRI_ID = Identifier.of(MODID, "oneiri");
 
     public static SoundEvent ONEIRI = SoundEvent.of(ONEIRI_ID);
 
@@ -44,14 +44,14 @@ public class ThePlaneswalker implements ModInitializer {
 
     public static MusicSound MUSIC = new MusicSound(ONEIRI_ENTRY, 300, 600, false);
 
-    public static Identifier DIMENSION = new Identifier(MODID, "void");
+    public static Identifier DIMENSION = Identifier.of(MODID, "void");
 
     public static Item PLANESWALKER_SIGIL = new Item(new Item.Settings().rarity(Rarity.EPIC));
 
     @Override
     public void onInitialize() {
         Registry.register(Registries.SOUND_EVENT, ONEIRI_ID, ONEIRI);
-        Registry.register(Registries.ITEM, new Identifier(MODID, "planeswalker_sigil"), PLANESWALKER_SIGIL);
+        Registry.register(Registries.ITEM, Identifier.of(MODID, "planeswalker_sigil"), PLANESWALKER_SIGIL);
         TCPowers.initialization();
         TCEntityActions.initialization();
         TCEntityConditions.initialization();

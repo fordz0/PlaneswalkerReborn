@@ -1,13 +1,13 @@
 import java.time.Year
 
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.11.8'
     id 'org.cadixdev.licenser' version '0.6.1'
     id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 group = rootProject.maven_group
 
@@ -38,6 +38,7 @@ repositories {
         filter {
             includeGroup "io.github.apace100"
             includeGroup "dev.onyxstudios.cardinal-components-api"
+            includeGroup "org.ladysnake.cardinal-components-api"
             includeGroup "io.github.ladysnake"
         }
     }
@@ -78,9 +79,12 @@ dependencies {
 
     modImplementation "maven.modrinth:origins:${project.origins_version}"
     modImplementation "io.github.apace100:apoli:${project.apoli_version}"
-
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+}
+
+loom {
+    enableModProvidedJavadoc = false
 }
 
 processResources {
@@ -98,8 +102,8 @@ tasks.withType(JavaCompile).configureEach {
     // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
 
-    // Minecraft 1.18+ uses Java 17.
-    it.options.release = 17
+    // Minecraft 1.21+ uses Java 21.
+    it.options.release = 21
 }
 
 java {

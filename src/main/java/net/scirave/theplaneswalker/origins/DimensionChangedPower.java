@@ -17,24 +17,33 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.Power;
-import io.github.apace100.apoli.power.PowerType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import io.github.apace100.apoli.action.EntityAction;
+import io.github.apace100.apoli.condition.EntityCondition;
+import io.github.apace100.apoli.power.PowerConfiguration;
+import io.github.apace100.apoli.power.type.PowerType;
+import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
+public class DimensionChangedPower extends PowerType {
 
-public class DimensionChangedPower extends Power {
+    private final EntityAction entityAction;
 
-    private final Consumer<Entity> entityAction;
-
-    public DimensionChangedPower(PowerType<?> type, LivingEntity entity, Consumer<Entity> entityAction) {
-        super(type, entity);
+    public DimensionChangedPower(EntityAction entityAction, Optional<EntityCondition> condition) {
+        super(condition);
         this.entityAction = entityAction;
     }
 
     public void onChange() {
-        this.entityAction.accept(this.entity);
+        this.entityAction.execute(getHolder());
+    }
+
+    public EntityAction getEntityAction() {
+        return entityAction;
+    }
+
+    @Override
+    public @NotNull PowerConfiguration<?> getConfig() {
+        return TCPowers.DIMENSION_CHANGED;
     }
 
 }

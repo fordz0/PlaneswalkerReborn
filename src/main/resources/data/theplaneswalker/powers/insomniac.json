@@ -5,13 +5,13 @@
     "actions": [
       {
         "type": "origins:feed",
-        "food": -16,
+        "nutrition": -16,
         "saturation": 0
       },
       {
         "type": "origins:apply_effect",
         "effect": {
-          "effect": "minecraft:weakness",
+          "id": "minecraft:weakness",
           "duration": 3600,
           "amplifier": 1
         }

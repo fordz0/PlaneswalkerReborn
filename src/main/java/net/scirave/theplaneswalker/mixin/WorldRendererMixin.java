@@ -22,8 +22,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -54,11 +54,11 @@ public abstract class WorldRendererMixin {
     public abstract void scheduleBlockRenders(int minX, int minY, int minZ, int maxX, int maxY, int maxZ);
 
     @Inject(at = @At(value = "HEAD"), method = "render")
-    private void beforeRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+    private void beforeRender(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
 
         for (PlayerEntity plr : world.getPlayers()) {
 
-            ActivatedPositionPower power = (ActivatedPositionPower) TCPowers.DIMENSIONAL_RIFT.get(plr);
+            ActivatedPositionPower power = TCPowers.getPowerType(plr, TCPowers.DIMENSIONAL_RIFT, ActivatedPositionPower.class);
 
             if (power != null) {
                 BlockPos powerPos = power.pos;
@@ -96,7 +96,7 @@ public abstract class WorldRendererMixin {
     }
 
     @Inject(at = @At("TAIL"), method = "render")
-    public void afterRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+    public void afterRender(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         savedStates.forEach((pos, state) -> world.getWorldChunk(pos).setBlockState(pos, state, false));
         savedStates.clear();
     }

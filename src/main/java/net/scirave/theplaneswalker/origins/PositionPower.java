@@ -17,33 +17,54 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.Power;
-import io.github.apace100.apoli.power.PowerType;
-import net.minecraft.entity.LivingEntity;
+import io.github.apace100.apoli.condition.EntityCondition;
+import io.github.apace100.apoli.power.PowerConfiguration;
+import io.github.apace100.apoli.power.type.PowerType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.util.math.BlockPos;
+import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
-public class PositionPower extends Power {
+public class PositionPower extends PowerType {
 
     public BlockPos pos;
 
-
-    public PositionPower(PowerType<?> type, LivingEntity entity, BlockPos pos) {
-        super(type, entity);
+    public PositionPower(BlockPos pos, Optional<EntityCondition> condition) {
+        super(condition);
         this.pos = pos;
     }
 
     @Override
     public NbtElement toTag() {
-        return NbtHelper.fromBlockPos(pos);
+        NbtCompound tag = new NbtCompound();
+        tag.putInt("x", pos.getX());
+        tag.putInt("y", pos.getY());
+        tag.putInt("z", pos.getZ());
+        return tag;
     }
 
     @Override
     public void fromTag(NbtElement tag) {
-        pos = NbtHelper.toBlockPos((NbtCompound) tag);
+        if (tag instanceof NbtCompound compound
+                && compound.contains("x")
+                && compound.contains("y")
+                && compound.contains("z")) {
+            pos = new BlockPos(compound.getInt("x"), compound.getInt("y"), compound.getInt("z"));
+            return;
+        }
+        if (tag instanceof NbtIntArray intArray) {
+            int[] values = intArray.getIntArray();
+            if (values.length >= 3) {
+                pos = new BlockPos(values[0], values[1], values[2]);
+            }
+        }
     }
 
+    @Override
+    public @NotNull PowerConfiguration<?> getConfig() {
+        return TCPowers.POSITION;
+    }
 
 }

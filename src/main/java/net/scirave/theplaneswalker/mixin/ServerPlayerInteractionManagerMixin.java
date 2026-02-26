@@ -42,7 +42,7 @@ public class ServerPlayerInteractionManagerMixin {
     @Inject(method = "processBlockBreakingAction", at = @At("HEAD"))
     public void redirectedMethod(BlockPos pos, Action action, Direction direction, int worldHeight, int sequence, CallbackInfo ci) {
         ((ServerPlayerEntityInterface) player).setLastInteracted(pos);
-        PowerHolderComponent.getPowers(player, AttackBlockPower.class).forEach(AttackBlockPower::onAttack);
+        PowerHolderComponent.getPowerTypes(player, AttackBlockPower.class).forEach(AttackBlockPower::onAttack);
     }
 
 }

@@ -17,17 +17,24 @@
 
 package net.scirave.theplaneswalker.origins;
 
-import io.github.apace100.apoli.power.PowerType;
-import net.minecraft.entity.LivingEntity;
+import io.github.apace100.apoli.condition.EntityCondition;
+import io.github.apace100.apoli.power.PowerConfiguration;
 import net.minecraft.util.math.BlockPos;
+import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 public class ActivatedPositionPower extends PositionPower {
 
     public int range;
 
-    public ActivatedPositionPower(PowerType<?> type, LivingEntity entity, BlockPos pos, int range) {
-        super(type, entity, pos);
+    public ActivatedPositionPower(BlockPos pos, int range, Optional<EntityCondition> condition) {
+        super(pos, condition);
         this.range = range;
+    }
+
+    @Override
+    public @NotNull PowerConfiguration<?> getConfig() {
+        return TCPowers.ACTIVATED_POSITION;
     }
 
 }

@@ -38,7 +38,7 @@ public class ServerPlayerNetworkHandlerMixin {
 
     @Inject(method = "requestTeleport(DDDFFLjava/util/Set;)V", at = @At("HEAD"))
     public void teleporting(double x, double y, double z, float yaw, float pitch, Set<PositionFlag> flags, CallbackInfo ci) {
-        PowerHolderComponent.getPowers(this.player, OnTeleportPower.class).forEach(OnTeleportPower::onTeleport);
+        PowerHolderComponent.getPowerTypes(this.player, OnTeleportPower.class).forEach(OnTeleportPower::onTeleport);
     }
 
 }
